@@ -9,9 +9,11 @@ class Agent:
     def __init__(self, weights: numpy.ndarray = None, color: tuple[int, int, int] = (255, 255, 255)):
         if weights is None:
             first_layer = numpy.random.random_sample((24, 24))
-            second_layer = numpy.random.random_sample((24, 4))
+            second_layer = numpy.random.random_sample((24, 24))
+            third_layer = numpy.random.random_sample((24, 24))
+            fourth_layer = numpy.random.random_sample((24, 4))
 
-            weights = [first_layer, second_layer]
+            weights = [first_layer, second_layer, third_layer, fourth_layer]
         self._weights_ = weights
         self._color_ = color
 
@@ -60,7 +62,7 @@ class Agent:
             if abs(x) > AGENT_SIZE // 2 or abs(y) > AGENT_SIZE // 2
         ]
 
-        result = [5 if coordinate in food_coordinates else -1 for coordinate in other_coordinates]
+        result = [1 if coordinate in food_coordinates else -0.1 for coordinate in other_coordinates]
 
         return numpy.array(result)
 
@@ -68,7 +70,9 @@ class Agent:
         input_layer = self.observe(food_coordinates)
         first_hidden_layer = leaky_relu(input_layer.dot(self._weights_[0]) + 1)
         second_hidden_layer = leaky_relu(first_hidden_layer.dot(self._weights_[1]) + 1)
-        softmax_output = softmax(second_hidden_layer)
+        third_hidden_layer = leaky_relu(second_hidden_layer.dot(self._weights_[2]) + 1)
+        fourth_hidden_layer = leaky_relu(third_hidden_layer.dot(self._weights_[3]) + 1)
+        softmax_output = softmax(fourth_hidden_layer)
 
         return DIRECTIONS[softmax_output.argmax()]
 
